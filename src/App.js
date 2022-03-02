@@ -25,12 +25,43 @@ class App extends React.Component {
     console.log("items : ", this.state.items);
   }
 
+  delete = (item) => {
+    const thisItem = this.state.items;
+      console.log("Before Update Items : ", this.state.items)
+    const newItems = thisItem.filter(e => e.id !== item.id);
+    this.setState({items: newItems}, () => {
+      console.log("Update Items : ", this.state.items)
+    })
+  }
+
+  componentDidMount() {
+    const requestOptions = {
+      method: "GET",
+      headers: {"Content-Type": "application/json"},
+    };
+
+    fetch("http://localhost:8080/book", requestOptions)
+      .then((response) => response.json())
+      .then(
+        (response) => {
+          this.setState({
+            items: response.data,
+          });
+        },
+        (error) => {
+          this.setState({
+            error,
+          });
+        }
+      );
+  }
+
   render() {
         var todoItems = this.state.items.length > 0 && (
           <Paper style={{ margin: 16}}>
             <List>
               {this.state.items.map((item, idx) => (
-                <Todo item={item} key={item.id} />
+                <Todo item={item} key={item.id} delete={this.delete} />
               ))}
             </List>
           </Paper>
