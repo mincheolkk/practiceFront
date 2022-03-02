@@ -3,6 +3,7 @@ import Todo from './Todo';
 import './App.css';
 import { Paper, List, Container } from '@material-ui/core';
 import AddTodo from './AddTodo';
+import { call } from "./service/ApiService"
 
 class App extends React.Component {
 
@@ -17,42 +18,20 @@ class App extends React.Component {
   }
 
   add = (item) => {
-    const thisItem = this.state.items;
-    item.id = "ID-" + thisItem.length; 
-    item.done = false;
-    thisItem.push(item);
-    this.setState({items:thisItem});
-    console.log("items : ", this.state.items);
-  }
+    call("/todo", "POST", item).then((response) =>
+      this.setState({items: response.data})
+      );
+  };
 
   delete = (item) => {
-    const thisItem = this.state.items;
-      console.log("Before Update Items : ", this.state.items)
-    const newItems = thisItem.filter(e => e.id !== item.id);
-    this.setState({items: newItems}, () => {
-      console.log("Update Items : ", this.state.items)
-    })
-  }
+    call("/todo", "DELETE", item).then((response) =>
+      this.setState({items: response.data})
+      );
+  };
 
   componentDidMount() {
-    const requestOptions = {
-      method: "GET",
-      headers: {"Content-Type": "application/json"},
-    };
-
-    fetch("http://localhost:8080/book", requestOptions)
-      .then((response) => response.json())
-      .then(
-        (response) => {
-          this.setState({
-            items: response.data,
-          });
-        },
-        (error) => {
-          this.setState({
-            error,
-          });
-        }
+    call("/todo", "GET", null).then((response) =>
+      this.setState({items:response.data})
       );
   }
 
